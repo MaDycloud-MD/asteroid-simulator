@@ -12,8 +12,10 @@ function App() {
     <div className="container">
       <h1>🌍 Asteroid Impact Simulator</h1>
       <InputForm setImpactData={setImpactData} setDeflectionData={setDeflectionData} />
-      {impactData && <ImpactResult data={impactData} />}
-      {deflectionData && <DeflectionResult data={deflectionData} />}
+
+      {impactData && <ImpactResult impactData={impactData} />}
+      {deflectionData && <DeflectionResult deflectionData={deflectionData} />}
+
       <div style={{ width: "100%", height: "500px" }}>
         <ThreeScene impactData={impactData} />
       </div>

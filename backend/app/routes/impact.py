@@ -1,24 +1,42 @@
-from fastapi import APIRouter
-from app.schemas.models import ImpactRequest, ImpactResponse
+# app/routes/impact.py
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
 from app.services import physics
 
 router = APIRouter()
 
+class ImpactRequest(BaseModel):
+    diameter_m: float = Field(..., gt=0)
+    density_kg_m3: float = Field(3000.0, gt=0)
+    velocity_km_s: float = Field(..., gt=0)
+    angle_deg: float = Field(45.0, gt=0, le=90.0)
+    target_type: str = Field("rock")
+
+class ImpactResponse(BaseModel):
+    diameter_m: float
+    density_kg_m3: float
+    velocity_km_s: float
+    angle_deg: float
+    mass_kg: float
+    energy_joules: float
+    energy_megatons: float
+    breakup_altitude_m: float 
+    airburst: bool
+    transient_crater_m: float
+    final_crater_m: float
+    blast_radius_5m: float
+    blast_radius_1m: float
+
 @router.post("/compute", response_model=ImpactResponse)
 def compute_impact(req: ImpactRequest):
-    mass = physics.mass_from_diameter(req.diameter_m, req.density_kg_m3)
-    E = physics.kinetic_energy_joules(mass, req.velocity_km_s)
-    tnt = physics.tnt_equivalents(E)
-    crater = physics.rough_crater_diameter_km(E)
-    blast5 = physics.blast_radius_overpressure_km(E, 5)
-    blast1 = physics.blast_radius_overpressure_km(E, 1)
-
-    return ImpactResponse(
-        mass_kg=mass,
-        energy_joules=E,
-        tnt_megatons=tnt["megatons"],
-        crater_km=crater,
-        blast_radius_5psi_km=blast5,
-        blast_radius_1psi_km=blast1,
-        impact_type=physics.impact_type_simple(req.diameter_m)
-    )
+    try:
+        out = physics.run_collins_model(
+            diameter_m=req.diameter_m,
+            density_kg_m3=req.density_kg_m3,
+            velocity_km_s=req.velocity_km_s,
+            angle_deg=req.angle_deg,
+            target_type=req.target_type
+        )
+        return out
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

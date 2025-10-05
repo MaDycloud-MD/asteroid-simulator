@@ -1,10 +1,15 @@
-export default function DeflectionResult({ data }) {
+import React from "react";
+
+export default function DeflectionResult({ deflectionData }) {
+  if (!deflectionData) return <p>No deflection data yet. Run a simulation above.</p>;
+
   return (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md space-y-3">
-      <h2 className="text-xl font-semibold text-green-400">Deflection Simulation</h2>
-      <div className="flex justify-between"><span>Success:</span> <span>{data.success ? "✅ Yes" : "❌ No"}</span></div>
-      <div className="flex justify-between"><span>New Trajectory:</span> <span>{data.new_trajectory}</span></div>
-      <div className="flex justify-between"><span>Miss Distance:</span> <span>{data.miss_distance_km.toFixed(2)} km</span></div>
+    <div className="card">
+      <h2>Deflection Results</h2>
+      <p>New Impact Point Distance: {deflectionData.new_impact_distance_km?.toFixed(2) || "N/A"} km</p>
+      <p>Time to Impact Adjustment: {deflectionData.time_saved_yrs?.toFixed(2) || "N/A"} years</p>
+      <p>Velocity Change Applied: {deflectionData.delta_v_km_s?.toFixed(3) || "N/A"} km/s</p>
+      <p>Mitigation Success: {deflectionData.success ? "Yes" : "No"}</p>
     </div>
   );
 }
