@@ -5,7 +5,7 @@ router = APIRouter()
 
 @router.post("/simulate", response_model=DeflectionResponse)
 def simulate_deflection(req: DeflectionRequest):
-    # Simple toy model: deflection success if delta_v * lead_time * 3.15e7 > 1000 km
+    
     displacement_km = req.delta_v * 1000 * req.lead_time * 3.15e7 / 1000.0
     success = displacement_km > 1000
     return DeflectionResponse(

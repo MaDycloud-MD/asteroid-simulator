@@ -19,10 +19,7 @@ def atmosphere_density_at_altitude(h_m: float) -> float:
     return RHO_A0 * math.exp(-h_m / SCALE_HEIGHT)
 
 def breakup_altitude(diameter_m: float, velocity_km_s: float, strength_pa: float = DEFAULT_STRENGTH):
-    """
-    Solve for altitude where dynamic pressure q = 0.5 * rho(h) * v^2 equals material strength.
-    Returns altitude (m) or None if computation fails.
-    """
+
     v = velocity_km_s * 1000.0
     rho_required = 2.0 * strength_pa / (v * v)
     if rho_required <= 0:
@@ -39,11 +36,7 @@ def breakup_altitude(diameter_m: float, velocity_km_s: float, strength_pa: float
 def collins_transient_crater_diameter_m(diameter_m: float, density_impactor: float,
                                         velocity_km_s: float, angle_deg: float,
                                         target_density: float = 2500.0) -> float:
-    """
-    Collins-like transient crater scaling (approximate).
-    Returns transient crater diameter in meters.
-    Note: This implementation is a compact educational approximation.
-    """
+    
     L0 = diameter_m  # m
     rho_i = density_impactor
     rho_t = target_density
@@ -54,10 +47,7 @@ def collins_transient_crater_diameter_m(diameter_m: float, density_impactor: flo
     return Dtc_km * 1000.0
 
 def final_crater_diameter_m(Dtc_m: float) -> float:
-    """
-    Convert transient crater diameter to final rim-to-rim diameter (meters).
-    Uses simple/complex transition heuristic from Collins.
-    """
+    
     Dtc_km = Dtc_m / 1000.0
     if Dtc_km <= 2.56:
         Dfr_km = 1.25 * Dtc_km
@@ -70,10 +60,7 @@ def tnt_from_energy_megatons(E_joules: float) -> float:
     return E_joules / 4.184e15
 
 def blast_radius_from_energy_mt_m(E_mt: float, overpressure_psi: float = 5.0) -> float:
-    """
-    Approximate blast radius (meters) for a given overpressure level.
-    Uses cube-root scaling tied to energy (megaton).
-    """
+    
     if E_mt <= 0:
         return 0.0
     base_km = 3.0
@@ -82,10 +69,7 @@ def blast_radius_from_energy_mt_m(E_mt: float, overpressure_psi: float = 5.0) ->
 
 def run_collins_model(diameter_m: float, density_kg_m3: float, velocity_km_s: float,
                       angle_deg: float, target_type: str = "rock", strength_pa: float = DEFAULT_STRENGTH):
-    """
-    Full pipeline: mass, energy, breakup altitude, airburst decision, crater sizes, blast radii.
-    Returns a dict with detailed fields.
-    """
+    
     # mass & energy
     mass = mass_from_diameter(diameter_m, density_kg_m3)
     energy = kinetic_energy_joules(mass, velocity_km_s)
